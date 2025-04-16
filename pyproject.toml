@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mlops"
+authors = [
+    {name = "Felix Jahn", email = "belix97@gmail.com"},
+]
+description = "A modular package to perform MLOps tasks."
+readme = "README.md"
+requires-python = "==3.12.3"
+license = "MIT"
+classifiers = [
+    "Framework :: FastAPI",
+    "Programming Language :: Python :: 3",
+]
+version="0.1.0"
+keywords = ["mlops", "ml", "ops", "fastapi"]
+dependencies = [
+    "scikit-learn==1.6.1",
+    "pandas==2.2.3",
+    "numpy==2.2.4",
+    "pydantic==2.11",
+    "matplotlib",
+    "fastapi==0.115.12",
+    "pytest==8.3.5",
+    "mlflow==2.20.0"
+]
+
+[setuptools.packages.find]
+where = ["src"]  # list of folders that contain the packages (["."] by default)
+include = ["mlops*"]  # package names should match these glob patterns (["*"] by default)
+exclude = ["mlops.tests*"]  # exclude packages matching these glob patterns (empty by default)
