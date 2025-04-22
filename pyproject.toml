@@ -23,6 +23,8 @@ dependencies = [
     "numpy==2.2.4",
     "pydantic==2.11",
     "matplotlib",
+    "azure-ai-ml==1.24.0",
+    "azure-identity==1.19.0",
     "fastapi==0.115.12",
     "pytest==8.3.5",
     "mlflow==2.20.0"

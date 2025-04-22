@@ -1,0 +1,60 @@
+project:
+  name: my template
+  description: A simple template to demonstrate the use of config files.
+
+pipeline:
+  name: my_pipeline
+
+  display_name: My Pipeline
+  description: A simple pipeline to demonstrate the use of config files.
+  inputs:
+    raw_data:
+      type: uri_file
+      mode: ro_mount
+      description: The raw data to be used for training the model.
+    training_config:
+      type: uri_file
+      mode: ro_mount
+      description: The configuration file for training the model.
+  outputs:
+    evaluation:
+      type: uri_folder
+      mode: rw_mount
+      description: The evaluation results of the model.
+
+  jobs:
+    ingestion:
+      inputs:
+        raw_data: parent.inputs.raw_data
+        training_config: parent.inputs.training_config
+      outputs:
+       training_data:
+          type: uri_file
+          mode: rw_mount
+          description: The training data to be used for training the model.
+       test_data:
+          type: uri_file
+          mode: rw_mount
+          description: The test data to be used for evaluating the model.
+      environment: azureml://environments/env-felix-aml/versions/1
+    training:
+      inputs:
+        training_data: parent.jobs.ingestion.outputs.training_data
+        training_config: parent.inputs.training_config
+      outputs:
+        model:
+          type: mlflow_model
+          mode: rw_mount
+          description: The trained model.
+
+      environment: azureml://environments/env-felix-aml/versions/1
+    evaluation:
+      inputs:
+        model: parent.jobs.training.outputs.model
+        test_data: parent.jobs.ingestion.outputs.test_data
+
+      outputs:
+        evaluation: parent.outputs.evaluation
+
+      environment: azureml://environments/env-felix-aml/versions/1
+      
