@@ -2,7 +2,7 @@ from typing import Union, Dict, Any, Optional
 import re
 from abc import ABC
 from azure.ai.ml import Input, Output
-from azure.ai.ml.constants import AssetTypes, InputOutputModes
+from azure.ai.ml.constants import InputTypes, AssetTypes, InputOutputModes
 from pydantic import BaseModel, model_validator
 
 
@@ -33,7 +33,7 @@ class MLArgsDefinition(BaseModel):
 
     @staticmethod
     def check_if_valid_type(
-        field: str, obj: Union[AssetTypes, InputOutputModes]
+        field: str, obj: Union[InputTypes, AssetTypes, InputOutputModes]
     ) -> bool:
         """
         Check if the type is valid.
@@ -51,8 +51,11 @@ class MLArgsDefinition(BaseModel):
         """
         Validate the type of the asset.
         """
-        cls.check_if_valid_type(field=cls_instance.type, obj=AssetTypes)
+        try:
 
+            cls.check_if_valid_type(field=cls_instance.type, obj=AssetTypes)
+        except:
+            cls.check_if_valid_type(field=cls_instance.type, obj=InputTypes)
         cls.check_if_valid_type(field=cls_instance.mode, obj=InputOutputModes)
         return cls_instance
 
@@ -64,6 +67,12 @@ class MLJobInputs(BaseModel):
 
 class MLJobAsset(MLJobInputs):
     environment: str
+
+    @model_validator(mode="after")
+    @classmethod
+    def validate_job_module_class(cls, cls_instance):
+
+        return cls_instance
 
     @model_validator(mode="after")
     @classmethod
@@ -114,35 +123,16 @@ class Pipeline(BaseModel):
             if job_inputs:
                 for input_key, input_value in job_inputs.items():
                     if YAMLPipelineSyntax.PARENT_INPUTS in input_value:
-                        input_key = input_value.replace(
-                            YAMLPipelineSyntax.PARENT_INPUTS, ""
-                        )
-
-    def get_ml_job_inputs(self) -> dict[str, Input]:
-        """
-        Get the inputs for the jobs.
-        """
-        ml_job_inputs = {}
-        for job_name, job in self.jobs.items():
-            if job.inputs:
-                ml_job_inputs[job_name] = {
-                    key: Input(
-                        type=value.type,
-                        description=value.description,
-                        mode=value.mode,
-                        path=value.path,
-                    )
-                    for key, value in job.inputs.items()
-                }
-        return ml_job_inputs
+                        pass
 
 
 if __name__ == "__main__":
 
     import yaml
     from pathlib import Path
+    from mlops.config.config import Utils
 
-    CONFIG_PATH = Path(__file__).parent.parent.parent.parent / "config" / "config.yml"
+    CONFIG_PATH = Utils.load_config()
 
     if not CONFIG_PATH.exists():
         raise FileNotFoundError(f"Config file not found at {CONFIG_PATH}")

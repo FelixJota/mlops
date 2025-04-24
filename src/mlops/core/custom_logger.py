@@ -34,7 +34,8 @@ class CustomLogger(logging.Logger):
 
         # Create formatter
         formatter = logging.Formatter(
-            "%(name)s - %(asctime)s - %(levelname)s - %(message)s"
+            fmt="%(name)s - %(asctime)s - %(levelname)s - %(message)s",
+            datefmt="%Y-%d-%m %H:%M:%S",
         )
 
         # Add formatter to console handler

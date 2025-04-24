@@ -27,7 +27,8 @@ dependencies = [
     "azure-identity==1.19.0",
     "fastapi==0.115.12",
     "pytest==8.3.5",
-    "mlflow==2.20.0"
+    "mlflow==2.20.0",
+    "black==25.1.0"
 ]
 
 [setuptools.packages.find]
